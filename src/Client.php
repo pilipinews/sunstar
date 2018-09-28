@@ -37,6 +37,8 @@ class Client
 
         $result = preg_match('/<script>(.*?)<\/script>/i', $result, $matches);
 
+        echo json_encode($matches) . PHP_EOL;
+
         $script = str_replace('e(r);', 'r', $matches[1]);
 
         $result = $self->executor->evalJs((string) $script);
