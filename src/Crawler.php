@@ -2,9 +2,8 @@
 
 namespace Pilipinews\Website\Sunstar;
 
-use Pilipinews\Common\Client;
+use Pilipinews\Common\Crawler as DomCrawler;
 use Pilipinews\Common\Interfaces\CrawlerInterface;
-use Symfony\Component\DomCrawler\Crawler as DomCrawler;
 
 /**
  * Sunstar News Crawler
@@ -30,20 +29,21 @@ class Crawler implements CrawlerInterface
      */
     public function crawl()
     {
-        $items = array();
+        $result = array();
 
-        foreach ($this->pages as $page) {
-            $result = $this->items((string) $page);
+        foreach ((array) $this->pages as $page) {
+            $items = $this->items((string) $page);
 
-            $items = array_merge($items, $result);
+            $result = array_merge($result, $items);
         }
 
-        return $items;
+        return $result;
     }
 
     /**
      * Returns an array of articles to scrape.
      *
+     * @param  string $link
      * @return string[]
      */
     protected function items($link)
