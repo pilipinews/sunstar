@@ -4,16 +4,18 @@ namespace Pilipinews\Website\Sunstar;
 
 use Nacmartin\PhpExecJs\PhpExecJs;
 use Nacmartin\PhpExecJs\Runtime\ExternalRuntime;
+use Pilipinews\Common\Client as CurlClient;
 
 class Client
 {
-    const USER_AGENT = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/67.0.3396.87 Safari/537.36';
-
     /**
      * @var \Nacmartin\PhpExecJs\PhpExecJs
      */
     protected $executor;
 
+    /**
+     * Initializes the cURL session.
+     */
     public function __construct()
     {
         $binaries = array('node', 'nodejs');
@@ -26,52 +28,63 @@ class Client
     /**
      * Performs the HTTP request based on the given URL.
      *
-     * @param  string $link
+     * @param  string $url
      * @return string
      */
-    public static function request($link)
+    public static function request($url)
     {
+        $client = new CurlClient;
+
         $self = new static;
 
-        $result = $self->execute($link);
+        $client->url($url);
 
-        $result = preg_match('/<script>(.*?)<\/script>/i', $result, $matches);
+        $result = $client->execute(false);
 
-        echo $result . PHP_EOL;
+        echo json_encode($result) . PHP_EOL;
+
+        if ($self->redirected($result)) {
+            $cookie = $client->cookie($matches[1]);
+
+            $client->set(CURLOPT_COOKIE, $cookie);
+        }
+
+        return $client->execute();
+    }
+
+    /**
+     * Returns the cookie value based on given script.
+     *
+     * @param  string $result
+     * @return string
+     */
+    protected function cookie($result)
+    {
+        $pattern = '/<script>(.*?)<\/script>/i';
+
+        preg_match($pattern, $result, $matches);
 
         echo json_encode($matches) . PHP_EOL;
 
-        $script = str_replace('e(r);', 'r', $matches[1]);
+        $script = str_replace('e(r);', 'r', $result);
 
-        $result = $self->executor->evalJs((string) $script);
+        $eval = $this->executor->evalJs($script);
 
-        $result = str_replace('document.cookie=', 'x=', $result);
+        $search = array('document.cookie=', 'location.reload()');
 
-        $script = str_replace('location.reload()', 'x', $result);
+        $script = str_replace($search, array('x=', 'x'), $eval);
 
-        $cookie = $self->executor->evalJs($script);
-
-        return $self->execute($link, (string) $cookie);
+        return $this->executor->evalJs((string) $script);
     }
 
-    protected function execute($link, $cookie = null)
+    /**
+     * Checks if the result is being redirected.
+     *
+     * @param  string $result
+     * @return boolean
+     */
+    protected function redirected($result)
     {
-        $curl = curl_init();
-
-        if ($cookie !== null) {
-            curl_setopt($curl, CURLOPT_COOKIE, $cookie);
-        }
-
-        curl_setopt($curl, CURLOPT_URL, (string) $link);
-
-        curl_setopt($curl, CURLOPT_ENCODING, '');
-
-        curl_setopt($curl, CURLOPT_USERAGENT, self::USER_AGENT);
-
-        curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-
-        ($response = curl_exec($curl)) && curl_close($curl);
-
-        return (string) $response;
+        return strpos($result, 'You are being redirected') !== false;
     }
 }
