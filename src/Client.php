@@ -6,7 +6,7 @@ use Nacmartin\PhpExecJs\PhpExecJs;
 use Nacmartin\PhpExecJs\Runtime\ExternalRuntime;
 use Pilipinews\Common\Client as CurlClient;
 
-class Client
+class Client extends CurlClient
 {
     /**
      * @var \Nacmartin\PhpExecJs\PhpExecJs
@@ -22,6 +22,8 @@ class Client
 
         $runtime = new ExternalRuntime(null, $binaries);
 
+        parent::__construct();
+
         $this->executor = new PhpExecJs($runtime);
     }
 
@@ -33,23 +35,31 @@ class Client
      */
     public static function request($url)
     {
-        $client = new CurlClient;
-
         $self = new static;
 
-        $client->url($url);
+        $self->url($url);
 
-        $result = $client->execute(false);
+        $result = $self->execute(false);
 
-        echo json_encode($result) . PHP_EOL;
-
-        if ($self->redirected($result)) {
-            $cookie = $client->cookie($matches[1]);
-
-            $client->set(CURLOPT_COOKIE, $cookie);
+        if ($result === false) {
+            echo curl_error($this->curl) . PHP_EOL;
+        } else {
+            echo json_encode($result) . PHP_EOL;
         }
 
-        return $client->execute();
+        if ($self->redirected($result)) {
+            $pattern = '/<script>(.*?)<\/script>/i';
+
+            preg_match($pattern, $result, $matches);
+
+            echo json_encode($matches) . PHP_EOL;
+
+            $cookie = $self->cookie($matches[1]);
+
+            $self->set(CURLOPT_COOKIE, $cookie);
+        }
+
+        return $self->execute();
     }
 
     /**
@@ -60,15 +70,9 @@ class Client
      */
     protected function cookie($result)
     {
-        $pattern = '/<script>(.*?)<\/script>/i';
-
-        preg_match($pattern, $result, $matches);
-
-        echo json_encode($matches) . PHP_EOL;
-
         $script = str_replace('e(r);', 'r', $result);
 
-        $eval = $this->executor->evalJs($script);
+        $eval = $this->executor->evalJs((string) $script);
 
         $search = array('document.cookie=', 'location.reload()');
 
