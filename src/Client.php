@@ -6,6 +6,12 @@ use Nacmartin\PhpExecJs\PhpExecJs;
 use Nacmartin\PhpExecJs\Runtime\ExternalRuntime;
 use Pilipinews\Common\Client as CurlClient;
 
+/**
+ * Sunstar cURL Client
+ *
+ * @package Pilipinews
+ * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ */
 class Client extends CurlClient
 {
     /**
