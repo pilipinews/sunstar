@@ -45,7 +45,7 @@ class Client extends CurlClient
 
         $cert = __DIR__ . '/../cacert.pem';
 
-        $self->set(CURLOPT_SSL_VERIFYPEER, 1);
+        $self->set(CURLOPT_SSL_VERIFYPEER, 0);
 
         $self->set(CURLOPT_CAINFO, $cert);
 
