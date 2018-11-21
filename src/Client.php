@@ -2,35 +2,29 @@
 
 namespace Pilipinews\Website\Sunstar;
 
-use Nacmartin\PhpExecJs\PhpExecJs as Executor;
-use Nacmartin\PhpExecJs\Runtime\ExternalRuntime;
 use Pilipinews\Common\Client as CurlClient;
 
 /**
  * Sunstar cURL Client
  *
  * @package Pilipinews
- * @author  Rougin Royce Gutib <rougingutib@gmail.com>
+ * @author  Rougin Gutib <rougingutib@gmail.com>
  */
 class Client extends CurlClient
 {
     /**
-     * @var \Nacmartin\PhpExecJs\PhpExecJs
+     * @var \Pilipinews\Sunstar\Script
      */
-    protected $executor;
+    protected $evaluator;
 
     /**
      * Initializes the cURL session.
      */
     public function __construct()
     {
-        $binaries = array('node', 'nodejs');
-
-        $runtime = new ExternalRuntime(null, $binaries);
-
         parent::__construct();
 
-        $this->executor = new Executor($runtime);
+        $this->evaluator = new Script;
     }
 
     /**
@@ -43,28 +37,16 @@ class Client extends CurlClient
     {
         $self = new static;
 
-        $cert = __DIR__ . '/../cacert.pem';
-
         $self->set(CURLOPT_SSL_VERIFYPEER, 0);
-
-        $self->set(CURLOPT_CAINFO, $cert);
 
         $self->url($url);
 
         $result = $self->execute(false);
 
-        if ($result === false) {
-            echo curl_error($self->curl) . PHP_EOL;
-        } else {
-            echo json_encode($result) . PHP_EOL;
-        }
-
         if ($self->redirected($result)) {
             $pattern = '/<script>(.*?)<\/script>/i';
 
             preg_match($pattern, $result, $matches);
-
-            echo json_encode($matches) . PHP_EOL;
 
             $cookie = $self->cookie($matches[1]);
 
@@ -84,13 +66,13 @@ class Client extends CurlClient
     {
         $script = str_replace('e(r);', 'r', $result);
 
-        $eval = $this->executor->evalJs($script);
+        $eval = $this->evaluator->evaluate($script);
 
         $search = array('document.cookie=', 'location.reload()');
 
         $script = str_replace($search, array('x=', 'x'), $eval);
 
-        return $this->executor->evalJs($script);
+        return $this->evaluator->evaluate((string) $script);
     }
 
     /**
