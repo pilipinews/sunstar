@@ -2,7 +2,7 @@
 
 namespace Pilipinews\Website\Sunstar;
 
-use Nacmartin\PhpExecJs\PhpExecJs;
+use Nacmartin\PhpExecJs\PhpExecJs as Executor;
 use Nacmartin\PhpExecJs\Runtime\ExternalRuntime;
 use Pilipinews\Common\Client as CurlClient;
 
@@ -30,7 +30,7 @@ class Client extends CurlClient
 
         parent::__construct();
 
-        $this->executor = new PhpExecJs($runtime);
+        $this->executor = new Executor($runtime);
     }
 
     /**
@@ -43,24 +43,20 @@ class Client extends CurlClient
     {
         $self = new static;
 
+        $cert = __DIR__ . '/../cacert.pem';
+
+        $self->set(CURLOPT_SSL_VERIFYPEER, 1);
+
+        $self->set(CURLOPT_CAINFO, $cert);
+
         $self->url($url);
 
         $result = $self->execute(false);
-
-        // if ($result === false) {
-        //     echo curl_error($self->curl) . PHP_EOL;
-        // } else {
-        //     echo json_encode($result) . PHP_EOL;
-        // }
 
         if ($self->redirected($result)) {
             $pattern = '/<script>(.*?)<\/script>/i';
 
             preg_match($pattern, $result, $matches);
-
-            // echo json_encode($matches) . PHP_EOL;
-
-            // echo $matches[1];exit;
 
             $cookie = $self->cookie($matches[1]);
 
@@ -80,13 +76,13 @@ class Client extends CurlClient
     {
         $script = str_replace('e(r);', 'r', $result);
 
-        $eval = $this->executor->evalJs((string) $script);
+        $eval = $this->executor->evalJs($script);
 
         $search = array('document.cookie=', 'location.reload()');
 
         $script = str_replace($search, array('x=', 'x'), $eval);
 
-        return $this->executor->evalJs((string) $script);
+        return $this->executor->evalJs($script);
     }
 
     /**
