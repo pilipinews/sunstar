@@ -53,10 +53,18 @@ class Client extends CurlClient
 
         $result = $self->execute(false);
 
+        if ($result === false) {
+            echo curl_error($self->curl) . PHP_EOL;
+        } else {
+            echo json_encode($result) . PHP_EOL;
+        }
+
         if ($self->redirected($result)) {
             $pattern = '/<script>(.*?)<\/script>/i';
 
             preg_match($pattern, $result, $matches);
+
+            echo json_encode($matches) . PHP_EOL;
 
             $cookie = $self->cookie($matches[1]);
 
