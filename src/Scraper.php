@@ -64,7 +64,8 @@ class Scraper extends AbstractScraper implements ScraperInterface
     {
         is_string($elements) && $elements = array($elements);
 
-        foreach ((array) $elements as $key => $element) {
+        foreach ((array) $elements as $key => $element)
+        {
             $body = $this->crawler->filter($element)->last()->html();
 
             $body = (string) trim(preg_replace('/\s+/', ' ', $body));
@@ -83,10 +84,12 @@ class Scraper extends AbstractScraper implements ScraperInterface
      */
     protected function carousel(DomCrawler $crawler)
     {
-        $callback = function (DomCrawler $crawler) {
+        $callback = function (DomCrawler $crawler)
+        {
             $texts = $crawler->filter('.img-caption');
 
-            $function = function ($result, $index) use ($texts) {
+            $function = function ($result, $index) use ($texts)
+            {
                 $text = $texts->eq($index)->text();
 
                 $image = $result->attr('src') . ' - ' . $text;
@@ -112,7 +115,8 @@ class Scraper extends AbstractScraper implements ScraperInterface
      */
     protected function image(DomCrawler $crawler)
     {
-        $callback = function (DomCrawler $crawler) {
+        $callback = function (DomCrawler $crawler)
+        {
             $break = (string) '<br><br><br>';
 
             $result = $crawler->filter('img')->first();
@@ -144,7 +148,8 @@ class Scraper extends AbstractScraper implements ScraperInterface
      */
     protected function video(DomCrawler $crawler)
     {
-        $callback = function (DomCrawler $crawler) {
+        $callback = function (DomCrawler $crawler)
+        {
             $link = trim($crawler->attr('data-href'));
 
             $break = '<br><br><br>';

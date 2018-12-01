@@ -43,7 +43,8 @@ class Client extends CurlClient
 
         $result = $self->execute(false);
 
-        if ($self->redirected($result)) {
+        if ($self->redirected($result))
+        {
             $pattern = '/<script>(.*?)<\/script>/i';
 
             preg_match($pattern, $result, $matches);

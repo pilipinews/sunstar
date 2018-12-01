@@ -31,7 +31,8 @@ class Crawler implements CrawlerInterface
     {
         $result = array();
 
-        foreach ((array) $this->pages as $page) {
+        foreach ((array) $this->pages as $page)
+        {
             $items = $this->items((string) $page);
 
             $result = array_merge($result, $items);
@@ -54,7 +55,8 @@ class Crawler implements CrawlerInterface
 
         $news = $crawler->filter((string) $pattern);
 
-        $items = $news->each(function (DomCrawler $node) {
+        $items = $news->each(function (DomCrawler $node)
+        {
             $pattern = '.inner-content > .title > a';
 
             $result = $node->filter((string) $pattern);
