@@ -13,7 +13,7 @@ use Pilipinews\Common\Client as CurlClient;
 class Client extends CurlClient
 {
     /**
-     * @var \Pilipinews\Sunstar\Script
+     * @var \Pilipinews\Website\Sunstar\Script
      */
     protected $evaluator;
 
