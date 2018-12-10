@@ -28,7 +28,8 @@ class Scraper extends AbstractScraper implements ScraperInterface
     /**
      * @var string[]
      */
-    protected $texts = array("PHOTO: https://www.sunstar.com.ph/\n", 'Please refresh page for updates.');
+    protected $texts = array("PHOTO: https://www.sunstar.com.ph/\n", 'Please refresh page for updates.', 'ARTICLE_MOBILE_AD_CODE');
+
     /**
      * Returns the contents of an article.
      *
