@@ -1,7 +1,7 @@
 {
     "name": "pilipinews/sunstar",
-    "description": "Crawler and scraper for the Sunstar News website.",
-    "homepage": "https://github.com/pilipinews/sunstar",
+    "description": "Crawler/scraper for Sunstar News.",
+    "homepage": "https://pilipinews.github.io/",
     "license": "MIT",
     "authors":
     [

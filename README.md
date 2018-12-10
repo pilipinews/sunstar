@@ -7,8 +7,6 @@
 [![Quality Score][ico-code-quality]][link-code-quality]
 [![Total Downloads][ico-downloads]][link-downloads]
 
-Crawler and scraper for [Sunstar News](https://www.sunstar.com.ph/) website.
-
 ## Installation
 
 Install `Sunstar News` via [Composer](https://getcomposer.org/):
@@ -16,10 +14,6 @@ Install `Sunstar News` via [Composer](https://getcomposer.org/):
 ``` bash
 $ composer require pilipinews/sunstar
 ```
-
-## Basic Usage
-
-Coming soon.
 
 ## Changelog
 
