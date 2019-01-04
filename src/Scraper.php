@@ -46,13 +46,13 @@ class Scraper extends AbstractScraper implements ScraperInterface
 
         $this->crawler = $this->carousel($this->crawler);
 
-        $body = $this->body((array) $this->elements);
+        $body = $this->body($this->elements);
 
         $body = $this->video($this->image($body));
 
         $html = $this->html($body, $this->texts);
 
-        return new Article($title, (string) $html);
+        return new Article($title, $html, $link);
     }
 
     /**

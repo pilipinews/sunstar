@@ -16,7 +16,7 @@
     {
         "php": ">=5.3.0",
         "nacmartin/phpexecjs": "~2.0",
-        "pilipinews/common": "~0.1"
+        "pilipinews/common": "~0.2"
     },
     "require-dev":
     {
